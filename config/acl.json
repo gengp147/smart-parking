@@ -1,0 +1,11 @@
+{
+	"dump":{
+		"dump_list":[
+			{
+				"model_name":"cardet"
+			}
+		],
+		"dump_mode":"output",
+		"dump_path":"/root/tmp/tmp.JxpJYeczFg/om_model_test/dump"
+	}
+}

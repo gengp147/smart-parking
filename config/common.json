@@ -1,0 +1,36 @@
+{
+  "logging": {
+    "logging_path": "/media/feature/lib/sl_log/",
+    "file_log": {
+      "enable": true,
+      "filename": "common.msg",
+      "level": 2,
+      "stdout": false
+    },
+    "rotate_log" : {
+      "enable": true,
+      "filename": "rotate.msg",
+      "file_size": 1048576,
+      "file_num": 10,
+      "level": 2,
+      "stdout": false,
+      "default": true,
+      "data_ctl": true,
+      "data_ctl_stamp": 604800
+    },
+    "daily_log": {
+      "enable": true,
+      "filename": "daily.msg",
+      "max_files": 15,
+      "hour": 2,
+      "minute": 59,
+      "level": 2,
+      "stdout": false
+    }
+  },
+
+  "stream_cfg" : {
+    "redirection": "/media/feature/lib/config/stream_config.json"
+  },
+  "device_config": "/media/feature/lib/config/acl.json"
+}

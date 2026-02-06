@@ -1,0 +1,104 @@
+{
+  "source_number" : 1,
+
+  "inputs": [ "image", "parking", "access_config", "no_parking_area", "interval_frame_list", "private_data_config" ],
+
+  "outputs": [ "inout_outputs", "access_info", "illegal_park_outputs", "private_data"],
+
+  "workflow": [
+    {
+      "module_type": "VehicleDetectModule",
+      "unique_name": "veh_det_module",
+      "inputs": [ "image", "parking" ],
+      "outputs": [ "vehicles"],
+      "module_config": {
+        "model": "/media/feature/lib/models/cardet.om",
+        "except_out_road": false,
+        "veh_confi_thresh": 0.5
+      },
+      "thread_count": 1
+    },
+    {
+      "module_type": "VehicleReIdModule",
+      "unique_name": "veh_reid_module",
+      "inputs": [ "image", "vehicles" ],
+      "outputs": [ "vehicles_with_feature" ],
+      "module_config": {
+        "model": "/media/feature/lib/models/reid.om"
+      },
+      "thread_count": 1
+    },
+    {
+      "module_type": "VlpDetectModule",
+      "unique_name": "vlpd_module",
+      "inputs": [ "vehicles", "image" ],
+      "outputs": [ "vehs_with_vlp" ],
+      "module_config": {
+        "model": "/media/feature/lib/models/lpdet.om"
+      },
+      "thread_count": 1
+    },
+    {
+      "module_type": "VlpRecognizeModule",
+      "unique_name": "vlpr_module",
+      "inputs": [ "image", "vehs_with_vlp" ],
+      "outputs": [ "vehs_with_vlp_rec" ],
+      "module_config": {
+        "model" : "/media/feature/lib/models/lprec.om",
+        "vlpr" : {
+          "max_width": 500,
+          "min_width": 50
+        },
+        "priorty_province": 0,
+        "priorty_city": 0
+      },
+      "thread_count": 1
+    },
+    {
+      "module_type": "MultiObjTrackModule",
+      "unique_name": "mot_module",
+      "inputs": [ "vehs_with_vlp_rec", "vehicles_with_feature"],
+      "outputs": [ "vehs_with_trackid" ],
+      "module_config":
+      {
+        "print_debug": false,
+        "lostTrackDecay": true,
+        "plateDiffPenalty": true,
+        "plateDiffPenaltyGrade": 1
+      }
+    },
+
+    {
+      "module_type": "VehicleInOutParkModule",
+      "unique_name": "vehicle_in_out_park_module",
+      "inputs": [ "vehs_with_trackid", "parking", "interval_frame_list"],
+      "outputs": [ "inout_outputs", "newest_cache_list"],
+      "module_config": {},
+      "thread_count": 1
+    },
+    {
+      "module_type": "AccessModule",
+      "unique_name": "access_module",
+      "inputs": [ "vehs_with_trackid", "access_config", "newest_cache_list"],
+      "outputs": [ "access_info"],
+      "module_config": {}
+    },
+    {
+      "module_type": "IllegalParkingModule",
+      "unique_name": "illegal_park_module",
+      "inputs": [ "vehs_with_trackid", "parking", "newest_cache_list", "no_parking_area"],
+      "outputs": [ "illegal_park_outputs" ],
+      "module_config": {},
+      "thread_count": 1
+    },
+
+    {
+      "module_type": "PrivateDataModule",
+      "unique_name": "private_data_module",
+      "inputs": [ "vehs_with_trackid", "private_data_config", "newest_cache_list"],
+      "outputs": [ "private_data" ],
+      "module_config": {},
+      "thread_count": 1
+    }
+  ]
+}
