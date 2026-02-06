@@ -1,0 +1,6 @@
+{
+global:
+  AIH_Create;
+  AIH_Destroy;
+local: *;
+};
